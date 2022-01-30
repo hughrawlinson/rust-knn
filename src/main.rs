@@ -1,3 +1,4 @@
+use clap::Parser;
 use rand::thread_rng;
 use rand::Rng;
 
@@ -85,13 +86,23 @@ fn k_nearest_neighbors(k: usize, query_point: Point, dataset: &Vec<Datum>) -> Ve
   dataset_with_distances.into_iter().take(k).collect()
 }
 
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about=None)]
+struct Config {
+  #[clap(short, long, default_value = "10")]
+  k: usize,
+  #[clap(short, long, default_value = "1000")]
+  dataset_size: i32,
+}
+
 fn main() {
-  let dataset = create_dataset(100000);
+  let args = Config::parse();
+  let dataset = create_dataset(args.dataset_size);
 
   let query_point = Point::new_random();
   println!("query_point: {:?}", query_point);
 
-  let results = k_nearest_neighbors(3, query_point, &dataset);
+  let results = k_nearest_neighbors(args.k, query_point, &dataset);
   for (datum, distance) in results {
     println!("{:?} {:?}", datum.id, distance);
   }
