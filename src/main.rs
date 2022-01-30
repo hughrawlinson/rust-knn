@@ -72,44 +72,33 @@ struct KnnResult<T> {
   nearest_neighbors: Vec<NeighborWithDistance>,
 }
 
+fn run<T: NewRandom + Distance>(args: Config) -> KnnResult<T> {
+  let query_point = T::new_random();
+  let dataset = create_dataset(args.dataset_size);
+
+  let results = k_nearest_neighbors(args.k, &query_point, &dataset);
+
+  KnnResult {
+    query_point,
+    nearest_neighbors: results
+      .into_iter()
+      .map(|(datum, distance)| NeighborWithDistance {
+        neighbor_id: datum.id,
+        distance,
+      })
+      .collect(),
+  }
+}
+
 fn main() {
   let args = Config::parse();
-
   match args.point_type {
     PointType::TwoDimensional => {
-      let query_point = Point2d::new_random();
-      let dataset = create_dataset(args.dataset_size);
-
-      let results = k_nearest_neighbors(args.k, &query_point, &dataset);
-
-      let knn_result = KnnResult {
-        query_point,
-        nearest_neighbors: results
-          .into_iter()
-          .map(|(datum, distance)| NeighborWithDistance {
-            neighbor_id: datum.id,
-            distance,
-          })
-          .collect(),
-      };
+      let knn_result: KnnResult<Point2d> = run(args);
       println!("{}", serde_json::to_string(&knn_result).unwrap());
     }
     PointType::ThreeDimensional => {
-      let query_point = Point::new_random();
-
-      let dataset = create_dataset(args.dataset_size);
-      let results = k_nearest_neighbors(args.k, &query_point, &dataset);
-
-      let knn_result = KnnResult {
-        query_point,
-        nearest_neighbors: results
-          .into_iter()
-          .map(|(datum, distance)| NeighborWithDistance {
-            neighbor_id: datum.id,
-            distance,
-          })
-          .collect(),
-      };
+      let knn_result: KnnResult<Point> = run(args);
       println!("{}", serde_json::to_string(&knn_result).unwrap());
     }
   };
