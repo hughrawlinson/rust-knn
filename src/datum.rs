@@ -5,11 +5,11 @@ use rand::Rng;
 #[derive(Clone, Debug)]
 pub struct Datum<T: Distance> {
   point: T,
-  pub id: i32,
+  pub id: usize,
 }
 
 impl<T: Distance> Datum<T> {
-  fn new(point: T, id: i32) -> Datum<T> {
+  fn new(point: T, id: usize) -> Datum<T> {
     Datum { point, id }
   }
 
