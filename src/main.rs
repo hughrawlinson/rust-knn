@@ -1,11 +1,13 @@
-use clap::Parser;
+use clap::{ArgEnum, Parser};
 use serde::Serialize;
 
 mod datum;
 mod point;
+mod point2d;
 
 use crate::datum::Datum;
 use crate::point::Point;
+use crate::point2d::Point2d;
 
 pub trait Distance {
   fn distance(&self, other: &Self) -> f64;
@@ -39,6 +41,12 @@ fn k_nearest_neighbors<'a, T: Distance>(
   dataset_with_distances.into_iter().take(k).collect()
 }
 
+#[derive(ArgEnum, Clone, Debug)]
+enum PointType {
+  TwoDimensional,
+  ThreeDimensional,
+}
+
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about=None)]
 struct Config {
@@ -46,6 +54,8 @@ struct Config {
   k: usize,
   #[clap(short, long, default_value = "1000")]
   dataset_size: i32,
+  #[clap(short, long, default_value = "two-dimensional", arg_enum)]
+  point_type: PointType,
 }
 
 #[derive(Serialize)]
@@ -57,30 +67,50 @@ struct NeighborWithDistance {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct KnnResult {
-  query_point: Point,
+struct KnnResult<T> {
+  query_point: T,
   nearest_neighbors: Vec<NeighborWithDistance>,
 }
 
 fn main() {
   let args = Config::parse();
 
-  let query_point = Point::new_random();
+  match args.point_type {
+    PointType::TwoDimensional => {
+      let query_point = Point2d::new_random();
+      let dataset = create_dataset(args.dataset_size);
 
-  let dataset = create_dataset(args.dataset_size);
+      let results = k_nearest_neighbors(args.k, &query_point, &dataset);
 
-  let results = k_nearest_neighbors(args.k, &query_point, &dataset);
+      let knn_result = KnnResult {
+        query_point,
+        nearest_neighbors: results
+          .into_iter()
+          .map(|(datum, distance)| NeighborWithDistance {
+            neighbor_id: datum.id,
+            distance,
+          })
+          .collect(),
+      };
+      println!("{}", serde_json::to_string(&knn_result).unwrap());
+    }
+    PointType::ThreeDimensional => {
+      let query_point = Point::new_random();
 
-  let knn_result = KnnResult {
-    query_point,
-    nearest_neighbors: results
-      .into_iter()
-      .map(|(datum, distance)| NeighborWithDistance {
-        neighbor_id: datum.id,
-        distance,
-      })
-      .collect(),
+      let dataset = create_dataset(args.dataset_size);
+      let results = k_nearest_neighbors(args.k, &query_point, &dataset);
+
+      let knn_result = KnnResult {
+        query_point,
+        nearest_neighbors: results
+          .into_iter()
+          .map(|(datum, distance)| NeighborWithDistance {
+            neighbor_id: datum.id,
+            distance,
+          })
+          .collect(),
+      };
+      println!("{}", serde_json::to_string(&knn_result).unwrap());
+    }
   };
-
-  println!("{}", serde_json::to_string(&knn_result).unwrap());
 }
