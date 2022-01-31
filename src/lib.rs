@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 mod datum;
 mod point;
 mod point2d;
@@ -36,4 +38,21 @@ pub fn k_nearest_neighbors<'a, T: Distance>(
     .sort_by(|(_, distance_a), (_, distance_b)| distance_a.partial_cmp(distance_b).unwrap());
 
   dataset_with_distances.into_iter().take(k).collect()
+}
+
+pub fn classify<T: Distance>(results: &Vec<(&Datum<T>, f64)>) -> String {
+  let histogram: HashMap<String, i64> = HashMap::new();
+  results
+    .into_iter()
+    .fold(histogram, |mut acc, (datum, _)| {
+      acc.insert(
+        datum.class.clone(),
+        acc.get(&datum.class).map(|count| count + 1).unwrap_or(1),
+      );
+      acc
+    })
+    .into_iter()
+    .max_by_key(|&(_, count)| count)
+    .unwrap()
+    .0
 }

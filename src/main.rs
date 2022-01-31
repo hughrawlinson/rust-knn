@@ -30,6 +30,7 @@ struct NeighborWithDistance {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct KnnResult<T> {
+  classification: String,
   query_point: T,
   nearest_neighbors: Vec<NeighborWithDistance>,
 }
@@ -39,8 +40,10 @@ fn run<T: NewRandom + Distance>(args: Config) -> KnnResult<T> {
   let dataset = create_dataset(args.dataset_size);
 
   let results = k_nearest_neighbors(args.k, &query_point, &dataset);
+  let classification = classify(&results);
 
   KnnResult {
+    classification,
     query_point,
     nearest_neighbors: results
       .into_iter()

@@ -4,13 +4,14 @@ use rand::Rng;
 
 #[derive(Clone, Debug)]
 pub struct Datum<T: Distance> {
+  pub class: String,
   point: T,
   pub id: usize,
 }
 
 impl<T: Distance> Datum<T> {
-  fn new(point: T, id: usize) -> Datum<T> {
-    Datum { point, id }
+  fn new(point: T, id: usize, class: String) -> Datum<T> {
+    Datum { point, id, class }
   }
 
   pub fn distance_from_point(&self, point: &T) -> f64 {
@@ -22,7 +23,12 @@ impl<T: Distance + NewRandom> NewRandom for Datum<T> {
   fn new_random() -> Datum<T> {
     let point = T::new_random();
     let id = thread_rng().gen();
-    Datum::new(point, id)
+    let class = if thread_rng().gen::<f32>() > 0.5 {
+      "class_1".to_string()
+    } else {
+      "class_2".to_string()
+    };
+    Datum::new(point, id, class)
   }
 }
 
