@@ -23,7 +23,7 @@ struct Config {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct NeighborWithDistance {
-  neighbor_id: usize,
+  neighbor_id: i32,
   distance: f64,
 }
 

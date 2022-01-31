@@ -1,16 +1,17 @@
 use crate::{Distance, NewRandom};
 use rand::thread_rng;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Datum<T: Distance> {
   pub class: String,
   point: T,
-  pub id: usize,
+  pub id: i32,
 }
 
 impl<T: Distance> Datum<T> {
-  fn new(point: T, id: usize, class: String) -> Datum<T> {
+  fn new(point: T, id: i32, class: String) -> Datum<T> {
     Datum { point, id, class }
   }
 

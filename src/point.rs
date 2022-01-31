@@ -1,10 +1,10 @@
 use rand::thread_rng;
 use rand::Rng;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{Distance, NewRandom};
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Point {
   x: f64,

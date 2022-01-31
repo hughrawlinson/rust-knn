@@ -1,14 +1,14 @@
 use rand::thread_rng;
 use rand::Rng;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{Distance, NewRandom};
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Point2d {
-  x: f64,
-  y: f64,
+  pub x: f64,
+  pub y: f64,
 }
 
 impl Point2d {
