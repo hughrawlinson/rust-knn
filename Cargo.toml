@@ -10,7 +10,7 @@ default-run = "nearest_neighbor"
 rand = "0.8.0"
 clap = {version="3.0.14", features=["derive"]}
 serde = {version="1.0.136", features=["derive"]}
-serde_json = "1.0.59"
+serde_json = "1.0.79"
 mongodb = "2.1.0"
 tokio = "1.16.1"
 loadenv = "0.1.4"
