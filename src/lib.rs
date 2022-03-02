@@ -27,11 +27,11 @@ pub fn create_dataset<T: Distance + NewRandom>(number: i32) -> Vec<Datum<T>> {
 pub fn k_nearest_neighbors<'a, T: Distance>(
   k: usize,
   query_point: &T,
-  dataset: &'a Vec<Datum<T>>,
+  dataset: &'a [Datum<T>],
 ) -> Vec<(&'a Datum<T>, f64)> {
   let mut dataset_with_distances: Vec<(&Datum<T>, f64)> = dataset
-    .into_iter()
-    .map(|datum| (datum, datum.distance_from_point(&query_point)))
+    .iter()
+    .map(|datum| (datum, datum.distance_from_point(query_point)))
     .collect();
 
   dataset_with_distances
@@ -40,10 +40,10 @@ pub fn k_nearest_neighbors<'a, T: Distance>(
   dataset_with_distances.into_iter().take(k).collect()
 }
 
-pub fn classify<T: Distance>(results: &Vec<(&Datum<T>, f64)>) -> String {
+pub fn classify<T: Distance>(results: &[(&Datum<T>, f64)]) -> String {
   let histogram: HashMap<String, i64> = HashMap::new();
   results
-    .into_iter()
+    .iter()
     .fold(histogram, |mut acc, (datum, _)| {
       acc.insert(
         datum.class.clone(),
